@@ -14,3 +14,4 @@ Interesting problems that are reducible to SAT:
 - Infinite queen's
 - Game of life
 - Graph coloring
+- Hamiltonian path
