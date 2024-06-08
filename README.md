@@ -15,3 +15,11 @@ Interesting problems that are reducible to SAT:
 - Game of life
 - Graph coloring
 - Hamiltonian path
+
+# Code
+
+Run unit tests:
+
+```bash
+python3 -m unittest discover -s tests
+```
