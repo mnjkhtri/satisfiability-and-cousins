@@ -10,9 +10,17 @@ class BDDNode:
         return f"VAL: {self.val}, LOW: {low}, HIGH: {high}"
 
 class BDD:
-    def __init__(self):
+    def __init__(self, truth_table = None):
         self.root = None
-        self.num_beads = None # For truth table construction only
+        self.truth_table = truth_table
+
+        self.beads = set()
+
+    @property
+    def num_beads(self): return len(self.beads)
+
+    @property
+    def num_solutions(self): return sum(1 for t in self.truth_table if t == '1')
 
     @classmethod
     def build_from_expr(cls, expr):
@@ -59,19 +67,22 @@ class BDD:
         if len(truth_table) & (len(truth_table) - 1) != 0:
             raise ValueError("The length of the truth table must be a power of two.")
 
+        bdd = cls(truth_table)
+
         memo = {}
         def build_subtable(idx, subtable):
             if all(c == '0' for c in subtable): return False
             if all(c == '1' for c in subtable): return True
+            mid = len(subtable) // 2
+            if subtable[:mid] == subtable[mid:]:
+                return build_subtable(idx+1, subtable[:mid])
             if subtable not in memo: 
-                mid = len(subtable) // 2
                 node = BDDNode(idx, build_subtable(idx+1, subtable[:mid]), build_subtable(idx+1, subtable[mid:]))
+                bdd.beads.add(subtable)
                 memo[subtable] = node
             return memo[subtable]
 
-        bdd = cls()
         bdd.root = build_subtable(1, truth_table)
-        bdd.num_beads = len(memo)
         return bdd
     
     def display(self, node=None, indent=0):
